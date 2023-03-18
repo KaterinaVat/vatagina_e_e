@@ -28,25 +28,20 @@ std::istream& Rational::read(std::istream& istrm) {
 	char separator = 0;
 	int32_t den = 1;
 	istrm >> num >> separator >> den;
-	/*if (den > 0) {
+	if ((den > 0) && (separator==Rational::slash)){
 		istrm.good();
 		if (istrm.good()) {
-			if (den == 0) {
-				throw std::invalid_argument("Expected positive denumerator");
-			}
-			if (separator != Rational::slash) {
-				throw std::invalid_argument("Expected / symbol");
-			}
 			p_ = num;
 			q_ = den;
 			reducing(*this);
 		}
-	}*/
+		return istrm;
+	}
 	else {
 		istrm.setstate(std::ios_base::failbit);
 	}
-	return istrm;
 }
+
 
 std::ostream& operator<<(std::ostream& ostrm, const Rational& rhs) {
 	return rhs.write(ostrm);
