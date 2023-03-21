@@ -1,7 +1,7 @@
 #pragma once
 
-#ifndef RATIONAL_LIB
-#define RATIONAL_LIB
+#ifndef RATIONAL_RATIONAL_HPP_20230215
+#define RATIONAL_RATIONAL_HPP_20230215
 
 
 #include <iosfwd>
