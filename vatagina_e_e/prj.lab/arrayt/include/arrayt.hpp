@@ -71,7 +71,7 @@ ArrayT<T>::ArrayT(const ptrdiff_t size) {
 		else {
 			data_ = 0;
 		}
-		std::cout << "Array is built" << std::endl;
+		//std::cout << "Array is built" << std::endl;
 	}
 }
 template<typename T>
@@ -126,7 +126,7 @@ void ArrayT<T>::resize(const ptrdiff_t new_size) {
 			capasity_ = new_capacity;
 		}
 		ssize_ = new_size;
-		std::cout << "We changed size of array by " << ssize_ << std::endl;
+		//std::cout << "We changed size of array by " << ssize_ << std::endl;
 	}
 }
 
@@ -148,7 +148,7 @@ void ArrayT<T>::remove(const ptrdiff_t i) {
 		delete[] data_;
 		data_ = temp;
 		capasity_ -= 1;
-		std::cout << i << " index was delated" << std::endl;
+		//std::cout << i << " index was delated" << std::endl;
 	}
 }
 
@@ -163,7 +163,7 @@ void ArrayT<T>::insert(const ptrdiff_t i, const T value) {
 			data_[index] = data_[index - 1];	
 		}
 		data_[i] = value;
-		std::cout << "element was inserted" << std::endl;
+		//std::cout << "element was inserted" << std::endl;
 	}
 }
 
