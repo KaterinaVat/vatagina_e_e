@@ -39,10 +39,7 @@ public:
 	bool operator<= (const Rational& rhs)  const noexcept;
 	Rational operator+(const int lhs) noexcept;
 	Rational operator-(const int lhs) noexcept;
-	Rational operator+(Rational& const lhs) noexcept;
-	Rational operator-(Rational& const lhs) noexcept;
-	Rational operator*(Rational& const lhs) noexcept;
-	Rational operator/(Rational& const lhs);
+
 private:
 	int32_t p_{ 0 };
 	int32_t q_{ 1 };
@@ -51,4 +48,20 @@ private:
 
 std::istream& operator>>(std::istream& istrm, Rational& rhs);
 std::ostream& operator<<(std::ostream& out, const Rational& rhs);
+
+inline Rational operator+(const Rational& lhs, const Rational& rhs) noexcept {
+	return Rational(lhs) += rhs;
+}
+
+inline Rational operator-(const Rational& lhs, const Rational& rhs) noexcept {
+	return Rational(lhs) -= rhs;
+}
+
+inline Rational operator/(const Rational& lhs, const Rational& rhs) {
+	return Rational(lhs) /= rhs;
+}
+
+inline Rational operator*(const Rational& lhs, const Rational& rhs) noexcept {
+	return Rational(lhs) *= rhs;
+}
 #endif 
