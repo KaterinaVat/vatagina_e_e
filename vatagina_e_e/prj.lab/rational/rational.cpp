@@ -12,9 +12,23 @@ Rational::Rational(const int32_t num) noexcept {
 };
 
 Rational::Rational(const int32_t num, const int32_t denum) {
-	p_ = num;
-	q_ = denum;
-	if (q_ == 0)
+	if (((num > 0) || (num < 0)) && (denum > 0)) {
+		p_ = num;
+		q_ = denum;
+	}
+	else {
+		if ((num > 0) && (denum < 0)) {
+			p_ = num * (-1);
+				q_ = denum * (-1);
+		}
+		else {
+			if ((num < 0) && (denum < 0)) {
+				p_ = num * (-1);
+				q_ = denum * (-1);
+			}
+		}
+	}
+	if (denum == 0)
 		throw std::invalid_argument{ "Zero Denominator" };
 	reducing(*this);
 };
@@ -24,22 +38,57 @@ std::ostream& Rational::write(std::ostream& ostrm) const {
 	return ostrm;
 }
 std::istream& Rational::read(std::istream& istrm) {
-	int32_t num = 0;
-	char separator = 0;
-	int32_t den = 1;
-	istrm >> num >> separator >> den;
-	if ((den > 0) && (separator == Rational::slash)) {
-		istrm.good();
-		if (istrm.good()) {
-			p_ = num;
-			q_ = den;
-			reducing(*this);
-		}
+	char sym = ' ';
+	while (std::isspace(istrm.peek())) { // isspace - проверка на проблел 
+		sym = istrm.get();				// peek - возвращает следующий символ для чтения
+	}									// get - считывает несколько символов из потока
+	static const char minus{ '-' };
+	bool fr_is_neg = false;
+	if (istrm.peek() == minus) {
+		fr_is_neg = true;
+		sym = istrm.get();
+	}
+	int32_t numer = 0;
+
+	while (std::isdigit(istrm.peek())) {
+		sym = istrm.get();
+		numer *= 10;
+		numer += static_cast<int>(sym - '0');
+	}
+
+	if (sym == minus) {
+		istrm.setstate(std::ios_base::failbit);
 		return istrm;
 	}
-	else {
+
+	if (istrm.peek() != Rational::slash) {
 		istrm.setstate(std::ios_base::failbit);
+		return istrm;
 	}
+	int32_t denumer = 0;
+	while (std::isdigit(istrm.peek())) {
+		sym = istrm.get();
+		denumer *= 10;
+		denumer += static_cast<int>(sym - '0');
+	}
+
+	if (sym == '/') {
+		istrm.setstate(std::ios_base::failbit);
+		return istrm;
+	}
+	if (istrm.good()) {
+		if (denumer == 0) {
+			istrm.setstate(std::ios_base::failbit);
+			return istrm;
+		} 
+		p_ = numer;
+		q_ = denumer;
+		if (fr_is_neg){
+		p_ = numer*(-1);
+		}
+		reducing(*this);
+	}
+	return istrm;
 }
 
 
@@ -58,31 +107,6 @@ Rational Rational::operator--() noexcept {
 	return (*this -= 1);
 }
 
-Rational Rational::operator+(Rational& const lhs) noexcept {
-	p_ = lhs.p_ * q_ + lhs.q_ * p_;
-	q_ = lhs.q_ * q_;
-	reducing(*this);
-	return *this;
-}
-Rational Rational::operator-(Rational& const lhs) noexcept {
-	p_ = lhs.q_ * p_ - lhs.p_ * q_;
-	q_ = lhs.q_ * q_;
-	reducing(*this);
-	return *this;
-}
-Rational Rational::operator*(Rational& const lhs) noexcept {
-	p_ = p_ * lhs.p_;
-	q_ = q_ * lhs.q_;
-	reducing(*this);
-	return *this;
-}
-Rational Rational::operator/(Rational& const lhs) {
-	Rational temp = lhs;
-	p_ = p_ * lhs.q_;
-	q_ = q_ * lhs.p_;
-	reducing(*this);
-	return *this;
-}
 Rational Rational::operator+(const int lhs) noexcept {
 	p_ += q_ * lhs;
 	return *this;
@@ -135,8 +159,8 @@ Rational Rational::operator+=(const Rational& rhs) noexcept {
 	return *this;
 }
 Rational Rational::operator-=(const Rational& rhs) noexcept {
-	p_ = rhs.q_ * p_ - rhs.p_ * q_;
-	q_ = rhs.q_ * q_;
+		p_ = rhs.q_ * p_ - rhs.p_ * q_;
+		q_ = rhs.q_ * q_;
 	reducing(*this);
 	return *this;
 }
@@ -206,6 +230,8 @@ bool Rational::operator<= (const Rational& rhs)  const noexcept {
 		return false;
 	}
 }
+
+
 
 
 
