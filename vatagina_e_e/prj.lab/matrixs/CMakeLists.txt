@@ -5,4 +5,3 @@ target_include_directories(matrixs PUBLIC
   $<INSTALL_INTERFACE:include>
 )
 install(TARGETS matrixs)
-add_subdirectory(src);
