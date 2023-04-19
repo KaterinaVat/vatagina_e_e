@@ -12,33 +12,36 @@ class Rational {
 public:
 	Rational() = default;
 	Rational(const Rational&) = default;
+	Rational(const Rational&&)=default;
 	Rational(const int32_t num) noexcept;
 	Rational(const int32_t num, const int32_t denom);
-	Rational& operator=(const Rational&) = default;
+	Rational& operator=(const Rational&) ;
 	~Rational() = default;
 	std::ostream& write(std::ostream& ostrm) const;
 	std::istream& read(std::istream& istrm);
 
 
-	Rational reducing(Rational& rhs);
-	Rational completing(Rational& rhs);
-	int32_t num() const noexcept { return p_; }
-	int32_t denom() const noexcept { return q_; }
+	void reducing();
+	
+	
 	Rational operator++() noexcept;
+	Rational operator++(int) noexcept;
 	Rational operator--() noexcept;
+	Rational operator--(int) noexcept;
 	Rational operator- () noexcept;
 	Rational operator+=(const Rational& rhs) noexcept;
 	Rational operator-=(const Rational& rhs) noexcept;
 	Rational operator*=(const Rational& rhs) noexcept;
 	Rational operator/=(const Rational& rhs);
-	bool operator==(const Rational& rhs) const noexcept;
-	bool operator!=(const Rational& rhs)  const noexcept;
-	bool operator> (const Rational& rhs)  const noexcept;
-	bool operator< (const Rational& rhs)  const noexcept;
-	bool operator>= (const Rational& rhs)  const noexcept;
-	bool operator<= (const Rational& rhs)  const noexcept;
+	
 	Rational operator+(const int lhs) noexcept;
 	Rational operator-(const int lhs) noexcept;
+	bool operator==( const Rational& rhs) const noexcept;
+	bool operator!=(const Rational& rhs)  const noexcept;
+	bool operator> (const Rational& rhs)  const noexcept;
+	bool operator< ( const Rational& rhs)  const noexcept;
+	bool operator>= (const Rational& rhs)  const noexcept;
+	bool operator<= ( const Rational& rhs)  const noexcept;		
 
 private:
 	int32_t p_{ 0 };
