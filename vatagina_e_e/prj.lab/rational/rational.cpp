@@ -30,7 +30,7 @@ Rational::Rational(const int32_t num, const int32_t denum) {
 	}
 	if (denum == 0)
 		throw std::invalid_argument{ "Zero Denominator" };
-	reducing(*this);
+	reducing();
 };
 
 std::ostream& Rational::write(std::ostream& ostrm) const {
@@ -48,12 +48,12 @@ std::istream& Rational::read(std::istream& istrm) {
 		fr_is_neg = true;
 		sym = istrm.get();
 	}
-	int32_t numer = 0;
+
 
 	while (std::isdigit(istrm.peek())) {
 		sym = istrm.get();
-		numer *= 10;
-		numer += static_cast<int>(sym - '0');
+		num *= 10;
+		num += static_cast<int>(sym - '0');
 	}
 
 	if (sym == minus) {
@@ -65,32 +65,36 @@ std::istream& Rational::read(std::istream& istrm) {
 		istrm.setstate(std::ios_base::failbit);
 		return istrm;
 	}
-	int32_t denumer = 0;
+	
 	while (std::isdigit(istrm.peek())) {
 		sym = istrm.get();
-		denumer *= 10;
-		denumer += static_cast<int>(sym - '0');
+		denom *= 10;
+		denom += static_cast<int>(sym - '0');
 	}
 
 	if (sym == '/') {
 		istrm.setstate(std::ios_base::failbit);
 		return istrm;
 	}
-	if (istrm.good()) {
-		if (denumer == 0) {
+	if (istrm.good() || istrm.eof()) {
+		if (denom == 0) {
 			istrm.setstate(std::ios_base::failbit);
 			return istrm;
 		} 
-		p_ = numer;
-		q_ = denumer;
+		p_ = num;
+		q_ = denom;
 		if (fr_is_neg){
-		p_ = numer*(-1);
+		p_ = num*(-1);
 		}
-		reducing(*this);
+		reducing();
 	}
 	return istrm;
 }
-
+Rational& Rational::operator=(const Rational& rhs) {
+    p_ = rhs.p_;
+    q_ = rhs.q_;
+    return *this;
+}
 
 std::ostream& operator<<(std::ostream& ostrm, const Rational& rhs) {
 	return rhs.write(ostrm);
@@ -115,26 +119,12 @@ Rational Rational::operator-(const int lhs) noexcept {
 	p_ -= q_ * lhs;
 	return *this;
 }
-Rational Rational::completing(Rational& rhs) {
-	if ((rhs.q_ < 0) && (rhs.p_ < 0)) {
-		p_ = abs(rhs.p_);
-		q_ = abs(rhs.q_);
-	}
-	else {
-		if (rhs.q_ < 0) {
-			p_ = -rhs.p_;
-			q_ = abs(rhs.q_);
-		}
-	}
-	return (*this);
-}
 
-Rational Rational::reducing(Rational& rhs) {
-	completing(rhs);
-	int32_t counter = std::max(rhs.p_, rhs.q_);
+void Rational::reducing() {
+	int32_t counter = std::min(p_, q_);
 	int32_t ans = 1;
 	while (counter > 0) {
-		if ((rhs.p_ % counter == 0) && (rhs.q_ % counter == 0)) {
+		if ((p_ % counter == 0) && (q_ % counter == 0)) {
 			ans = counter;
 			break;
 		}
@@ -142,32 +132,31 @@ Rational Rational::reducing(Rational& rhs) {
 			counter -= 1;
 		}
 	}
-	rhs.p_ /= ans;
-	rhs.q_ /= ans;
-	return (rhs);
+	p_ /= ans;
+	q_ /= ans;
 }
 Rational Rational::operator- () noexcept {
 	p_ = -p_;
 	q_ = q_;
-	reducing(*this);
+	reducing();
 	return (*this);
 }
 Rational Rational::operator+=(const Rational& rhs) noexcept {
 	p_ = rhs.p_ * q_ + rhs.q_ * p_;
 	q_ = rhs.q_ * q_;
-	reducing(*this);
+	reducing();
 	return *this;
 }
 Rational Rational::operator-=(const Rational& rhs) noexcept {
 		p_ = rhs.q_ * p_ - rhs.p_ * q_;
 		q_ = rhs.q_ * q_;
-	reducing(*this);
+	reducing();
 	return *this;
 }
 Rational Rational::operator*=(const Rational& rhs) noexcept {
 	p_ = rhs.p_ * p_;
 	q_ = rhs.q_ * q_;
-	reducing(*this);
+	reducing();
 	return *this;
 }
 Rational Rational::operator/=(const Rational& rhs) {
@@ -177,7 +166,7 @@ Rational Rational::operator/=(const Rational& rhs) {
 	else {
 		p_ *= rhs.q_;
 		q_ *= rhs.p_;
-		reducing(*this);
+		reducing();
 		return(*this);
 	}
 }
@@ -230,9 +219,16 @@ bool Rational::operator<= (const Rational& rhs)  const noexcept {
 		return false;
 	}
 }
-
-
-
+Rational Rational::operator++(int) {
+    Rational tmp(*this);
+    ++(*this);
+    return tmp;
+}
+Rational Rational::operator--(int) {
+    Rational tmp(*this);
+    --(*this);
+    return tmp;
+}
 
 
 
