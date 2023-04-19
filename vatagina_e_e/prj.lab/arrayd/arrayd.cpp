@@ -9,7 +9,7 @@
 
 ArrayD::ArrayD() {
     data_ = nullptr;
-    size_ = 0;
+    ssize_ = 0;
     capacity_ = 0;
 }
 
