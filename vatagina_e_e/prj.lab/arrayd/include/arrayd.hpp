@@ -13,7 +13,7 @@
 class ArrayD {
 	
 public:
-	explicit ArrayD() = default;
+	explicit ArrayD() ;
 
 	~ArrayD();
 
