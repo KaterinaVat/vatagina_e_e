@@ -6,6 +6,13 @@
 #include <cmath>
 
 
+
+ArrayD::ArrayD() {
+    data_ = nullptr;
+    size_ = 0;
+    capacity_ = 0;
+}
+
 ArrayD::~ArrayD() {
 	delete[] data_;
 }
