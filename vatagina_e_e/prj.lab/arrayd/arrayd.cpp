@@ -29,22 +29,31 @@ ArrayD::ArrayD(const ptrdiff_t size) {
 	if (size < 0) {
 		throw std::invalid_argument("Get size > 0");
 	}
-	else {
-		ssize_ = size;
-		capasity_ = size;
-		if (ssize_ != 0) {
-			data_ = new double[ssize_];
-		}
-		else {
-			data_ = 0;
-		}
-		//std::cout << "Array is built" << std::endl;
+	ssize_ = size;
+	capasity_ = size;
+	data_ = new double[ssize_];
 	}
+	for (std::ptrdiff_t i=0; i<size; ++i){
+		data_[i]=0;
+	}
+}
+ArrayD& ArrayD::operator=(const ArrayD& other) {
+   	 if(this == &other){
+        return *this;
+   	 }
+    	size_ = other.ssize_;
+    	capacity_ = other.capacity_;
+    	delete[] data_;
+    	data_ = new double[capacity_];
+    	for (std::ptrdiff_t i = 0; i < ssize(); ++i) {
+        	new (data_ + i) double (other.data_[i]);
+    	}
+   	return *this;
 }
 
 double& ArrayD::operator[] (const ptrdiff_t index) {
 	if ((index < 0) || (index >= capasity_)) {
-		throw std::invalid_argument("Index is out of acceptable area");
+		throw std::invalid_argument("Index is out of range");
 	}
 	else {
 		return data_[index];
@@ -53,7 +62,7 @@ double& ArrayD::operator[] (const ptrdiff_t index) {
 
 const double& ArrayD::operator[] (const ptrdiff_t index) const {
 	if ((index < 0) || (index >= capasity_)) {
-		throw std::invalid_argument("Index is out of acceptable area");
+		throw std::invalid_argument("Index is out of range");
 	}
 	else {
 		return data_[index];
@@ -71,26 +80,28 @@ void ArrayD::resize(const ptrdiff_t new_size) {
 		throw std::invalid_argument("size of array must be larger 0");
 	}
 	else {
-		if (new_size > capasity_) {
-			ptrdiff_t new_capacity = std::max(new_size, ssize_ * 2);
-			double* temp = new double[new_capacity];
-			for (ptrdiff_t i = 0; i < ssize_; ++i) {
-				temp[i] = data_[i];
-			}
-			delete[] data_;
-			data_ = temp;
-			capasity_ = new_capacity;
+		if (new_size > capacity_) {
+			capacity_=new_size;
+			if (capasity_<ssize()){
+				ssize_=capacity_;
+				return;
 		}
-		else {
-			//new_size<capasity;
-			ptrdiff_t new_capacity = new_size;
-			double* temp = new double[new_size];
-			for (ptrdiff_t i = 0; i < new_size; ++i) {
-				temp[i] = data_[i];
+		double* tmpM_=new double[capacity_];
+		if (data_!=nullptr){
+		std::copy(data_, data_+ssize_, tmpM_);
+		} else {
+			data_=nullptr;
 			}
-			delete[] data_;
-			data_ = temp;
-			capasity_ = new_capacity;
+		std::fill(data_,data_+ssize(), 0);
+		}
+		delete[] data_;
+		data_=tmpM_;
+		}
+		
+		if (new_size>ssize())
+			for (std::ptrdiff_t i=ssize(); i<ssize(); ++i){
+			data_[i]=0;
+			}
 		}
 		ssize_ = new_size;
 		//std::cout << "We changed size of array by " << ssize_ << std::endl;
@@ -102,32 +113,22 @@ void ArrayD::remove(const ptrdiff_t i) {
 		throw std::invalid_argument("uncorrect index");
 	}
 	else {
-		ssize_ -= 1;
-		double* temp = new double[ssize_];
-		for (ptrdiff_t index = 0; index < i; ++index) {
-			temp[index] = data_[index];
-		}
-		for (ptrdiff_t index = i; index < (ssize_ + 1); ++index) {
+		for (ptrdiff_t index = i; index < ssize(); ++index) {
 			temp[index] = data_[index + 1];
 		}
-		delete[] data_;
-		data_ = temp;
-		capasity_ -= 1;
-		//std::cout << i << " index was delated" << std::endl;
+		resize(ssize()-1);
 	}
 }
 
 
 void ArrayD::insert(const ptrdiff_t i, const double value) {
-	if (i < 0) {
-		throw std::invalid_argument("index must be larger 0");
+	if (i < 0 || i>ssize()) {
+		throw std::invalid_argument("invalidal index");
 	}
-	else {
 		resize(ssize_ + 1);
 		for (ptrdiff_t index = ssize_ - 1; index > i; --index) {
 			data_[index] = data_[index - 1];
 		}
 		data_[i] = value;
 		//std::cout << "element was inserted" << std::endl;
-	}
 }
