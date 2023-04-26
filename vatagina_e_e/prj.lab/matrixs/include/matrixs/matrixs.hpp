@@ -18,8 +18,8 @@ public:
         if (m_ < 0 and n_ < 0) {
             throw std::invalid_argument("Size must be positive")
         }
-        m_ = row; //êîëè÷åñòâî ñòîëáöîâ
-        n_ = col; //êîëè÷åñòâî ñòğîê
+        m_ = row; //ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã±Ã²Ã®Ã«Ã¡Ã¶Ã®Ã¢
+        n_ = col; //ÃªÃ®Ã«Ã¨Ã·Ã¥Ã±Ã²Ã¢Ã® Ã±Ã²Ã°Ã®Ãª
         int* data_ = new int[m_ * n_];
         for (int i = 0; i < (m_ * n_); ++i) {
             data[i] = 0;
@@ -86,6 +86,6 @@ public:
 private:
     ptrdiff_t m_ = 0;
     ptrdiff_t n_ = 0;
-    int** data_ = nullptr;
+    int* data_ = nullptr;
 
 };
