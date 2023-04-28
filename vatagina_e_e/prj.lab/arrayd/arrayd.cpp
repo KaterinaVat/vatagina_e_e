@@ -100,6 +100,7 @@ void ArrayD::remove(const ptrdiff_t i) {
 		for (ptrdiff_t t = i+1; t< ssize_; ++t) {
 			data_[t-1] = data_[t];
 		}
+		resize(ssize_-1);
 	}
 }
 
