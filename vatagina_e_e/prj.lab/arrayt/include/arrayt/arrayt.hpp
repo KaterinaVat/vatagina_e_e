@@ -18,7 +18,7 @@ public:
 
 	~ArrayT();
 
-	ArrayT(const ArrayT<T>& other);
+	ArrayT(const ArrayT<T>&);
 
 	ArrayT(const ptrdiff_t size);
 
@@ -30,6 +30,7 @@ public:
 
 	ptrdiff_t ssize() const noexcept;
 
+	void change_capasity(const ptrdiff_t other);
 
 	void resize(const ptrdiff_t new_size);
 
@@ -53,7 +54,8 @@ ArrayT<T>::~ArrayT() {
 template<typename T>
 ArrayT<T>::ArrayT(const ArrayT<T>& other) {
 	ssize_ = other.ssize_;
-	capasity_ = other.ssize_;
+	capasity_ = other.capasity_;
+	data_ = new T[capasity_];
 	for (ptrdiff_t i = 0; i < ssize_; ++i) {
 		data_[i] = other.data_[i];
 	}
@@ -66,15 +68,22 @@ ArrayT<T>::ArrayT(const ptrdiff_t size) {
 	else {
 		ssize_ = size;
 		capasity_ = size;
-		if (ssize_ != 0) {
-			data_ = new T[ssize_];
-		}
-		else {
-			data_ = 0;
-		}
+		data_ = new T[capasity_];
+		std::fill(data_, data_ + ssize_, 0);
 		//std::cout << "Array is built" << std::endl;
 	}
 }
+
+template<typename T>
+void ArrayT<T>::change_capasity(const ptrdiff_t new_cap) {
+	capasity_ = new_cap;
+	T* temp = new T[capasity_];
+	std::copy(data_, data_ + ssize(), temp);
+	std::fill(data_ + ssize_, data_ + capasity_, 0);
+	delete[] data_;
+	data_ = temp;
+}
+
 template<typename T>
 T& ArrayT<T>::operator[] (const ptrdiff_t index) {
 	if ((index < 0) || (index >= capasity_)) {
@@ -86,7 +95,7 @@ T& ArrayT<T>::operator[] (const ptrdiff_t index) {
 }
 template<typename T>
 const T& ArrayT<T>::operator[] (const ptrdiff_t index) const {
-	if ((index < 0) || (index >= capasity_)) {
+	if ((index < 0) || (index >= ssize())) {
 		throw std::invalid_argument("Index is out of acceptable area");
 	}
 	else {
@@ -101,55 +110,30 @@ ptrdiff_t ArrayT<T>::ssize() const noexcept {
 
 template<typename T>
 void ArrayT<T>::resize(const ptrdiff_t new_size) {
-	if (new_size < 0) {
+	if (new_size <= 0) {
 		throw std::invalid_argument("size of array must be larger 0");
 	}
-	else {
-		if (new_size > capasity_) {
-			ptrdiff_t new_capacity = std::max(new_size, ssize_ * 2);
-			T* temp = new T[new_capacity];
-			for (ptrdiff_t i = 0; i < ssize_; ++i) {
-				temp[i] = data_[i];
-			}
-			delete[] data_;
-			data_ = temp;
-			capasity_ = new_capacity;
-		}
-		else {
-			//new_size<capasity;
-			ptrdiff_t new_capacity = new_size;
-			T* temp = new T[new_size];
-			for (ptrdiff_t i = 0; i < new_size; ++i) {
-				temp[i] = data_[i];
-			}
-			delete[] data_;
-			data_ = temp;
-			capasity_ = new_capacity;
-		}
-		ssize_ = new_size;
-		//std::cout << "We changed size of array by " << ssize_ << std::endl;
+
+	if (new_size > capasity_) {
+		change_capasity(new_size);
 	}
+	if (new_size > ssize_) {
+		std::fill(data_ + ssize_, data_ + new_size, 0);
+	}
+	ssize_ = new_size;
 }
 
 
 template<typename T>
 void ArrayT<T>::remove(const ptrdiff_t i) {
-	if ((i < 0) || (i > capasity_)) {
+	if ((i < 0) || (i >ssize())) {
 		throw std::invalid_argument("uncorrect index");
 	}
 	else {
-		ssize_ -= 1;
-		T* temp = new T[ssize_];
-		for (ptrdiff_t index = 0; index < i; ++index) {
-			temp[index] = data_[index];
+		for (ptrdiff_t t = i + 1; t < ssize_; ++t) {
+			data_[t - 1] = data_[t];
 		}
-		for (ptrdiff_t index = i; index < (ssize_ + 1); ++index) {
-			temp[index] = data_[index + 1];
-		}
-		delete[] data_;
-		data_ = temp;
-		capasity_ -= 1;
-		//std::cout << i << " index was delated" << std::endl;
+		resize(ssize_ - 1);
 	}
 }
 
@@ -166,6 +150,21 @@ void ArrayT<T>::insert(const ptrdiff_t i, const T value) {
 		data_[i] = value;
 		//std::cout << "element was inserted" << std::endl;
 	}
+}
+
+template<typename T>
+ArrayT<T>& ArrayT<T>::operator=(const ArrayT<T>& other) {
+	if (this == &other) {
+		return *this;
+	}
+	ssize_ = other.ssize_;
+	capasity_ = other.capasity_;
+	delete[] data_;
+	data_ = new T[capasity_];
+	for (std::ptrdiff_t i = 0; i < ssize(); ++i) {
+		new (data_ + i) T(other.data_[i]);
+	}
+	return *this;
 }
 
 #endif 
