@@ -5,6 +5,12 @@
 #include <algorithm>
 #include <cmath>
 
+ArrayD::ArrayD(){
+	ssize_=0;
+	capasity_=0;
+	data_=nullptr;
+}
+		
 
 ArrayD::~ArrayD() {
 	delete[] data_;
@@ -18,21 +24,16 @@ ArrayD::ArrayD(const ArrayD& other) {
 
 }
 
-ArrayD::ArrayD(const ptrdiff_t size) {
+ArrayD::ArrayD(const std::ptrdiff_t size) {
 	if (size < 0) {
 		throw std::invalid_argument("Get size > 0");
 	}
 	else {
 		ssize_ = size;
 		capasity_ = size;
-		if (ssize_ != 0) {
-			data_ = new double[ssize_];
-			std::fill(data_, data_ + ssize_, 0);
+		data_ = new double[ssize_];
+		std::fill(data_, data_ + ssize_, 0);
 		}
-		else {
-			data_ = nullptr;
-		}
-	}
 }
 
 ArrayD& ArrayD::operator=(const ArrayD& other) {
@@ -45,30 +46,26 @@ ArrayD& ArrayD::operator=(const ArrayD& other) {
 	}
 	return *this;
 }
-double& ArrayD::operator[] (const ptrdiff_t index) {
+double& ArrayD::operator[] (const std::ptrdiff_t index) {
 	if ((index < 0) || (index >= ssize())) {
 		throw std::invalid_argument("Index is out of acceptable area");
 	}
-	else {
-		return data_[index];
-	}
+	return data_[index];
 }
 
-const double& ArrayD::operator[] (const ptrdiff_t index) const {
+const double& ArrayD::operator[] (const std::ptrdiff_t index) const {
 	if ((index < 0) || (index >= ssize())) {
 		throw std::invalid_argument("Index is out of acceptable area");
 	}
-	else {
-		return data_[index];
-	}
+	return data_[index];
 }
 
 
-ptrdiff_t ArrayD::ssize() const noexcept {
+std::ptrdiff_t ArrayD::ssize() const noexcept {
 	return ssize_;
 };
 
-void ArrayD::change_capasity(const ptrdiff_t new_cap) {
+void ArrayD::change_capasity(const std::ptrdiff_t new_cap) {
 	capasity_ = new_cap;
 	double* temp = new double[capasity_];
 	std::copy(data_, data_ + ssize(), temp);
@@ -77,7 +74,7 @@ void ArrayD::change_capasity(const ptrdiff_t new_cap) {
 	data_ = temp;
 }
 
-void ArrayD::resize(const ptrdiff_t new_size) {
+void ArrayD::resize(const std::ptrdiff_t new_size) {
 	if (new_size <= 0) {
 		throw std::invalid_argument("size of array must be larger 0");
 	}
@@ -92,28 +89,23 @@ void ArrayD::resize(const ptrdiff_t new_size) {
 	}
 
 
-void ArrayD::remove(const ptrdiff_t i) {
+void ArrayD::remove(const std::ptrdiff_t i) {
 	if ((i < 0) || (i > capasity_)) {
 		throw std::invalid_argument("uncorrect index");
+	for (std::ptrdiff_t t = i+1; t< ssize_; ++t) {
+		data_[t-1] = data_[t];
 	}
-	else {
-		for (ptrdiff_t t = i+1; t< ssize_; ++t) {
-			data_[t-1] = data_[t];
-		}
-		resize(ssize_-1);
-	}
+	resize(ssize_-1);
 }
 
 
-void ArrayD::insert(const ptrdiff_t i, const double value) {
+void ArrayD::insert(const std::ptrdiff_t i, const double value) {
 	if (i < 0 || i>ssize()) {
 		throw std::invalid_argument("index must be larger 0");
 	}
-	else {
-		resize(ssize_ + 1);
-		for (ptrdiff_t index = ssize_ - 1; index > i; --index) {
-			data_[index] = data_[index - 1];
-		}
-		data_[i] = value;
+	resize(ssize_ + 1);
+	for (std::ptrdiff_t index = ssize_ - 1; index > i; --index) {
+		data_[index] = data_[index - 1];
 	}
+	data_[i] = value;
 }
