@@ -20,27 +20,27 @@ public:
 
 	ArrayT(const ArrayT<T>&);
 
-	ArrayT(const ptrdiff_t size);
+	ArrayT(const std::ptrdiff_t size);
 
 	ArrayT<T>& operator=(const ArrayT<T>&);
 
-	T& operator[] (const ptrdiff_t index);
+	T& operator[] (const std::ptrdiff_t index);
 
-	const T& operator[] (const ptrdiff_t index) const;
+	const T& operator[] (const std::ptrdiff_t index) const;
 
-	ptrdiff_t ssize() const noexcept;
+	std::ptrdiff_t ssize() const noexcept;
 
-	void change_capasity(const ptrdiff_t other);
+	void change_capasity(const std::ptrdiff_t other);
 
-	void resize(const ptrdiff_t new_size);
+	void resize(const std::ptrdiff_t new_size);
 
-	void remove(const ptrdiff_t i);
+	void remove(const std::ptrdiff_t i);
 
-	void insert(const ptrdiff_t i, const T value);
+	void insert(const std::ptrdiff_t i, const T value);
 
 private:
-	ptrdiff_t ssize_ = 0;
-	ptrdiff_t capasity_ = 0;
+	std::ptrdiff_t ssize_ = 0;
+	std::ptrdiff_t capasity_ = 0;
 	T* data_ = nullptr;
 };
 
@@ -56,12 +56,12 @@ ArrayT<T>::ArrayT(const ArrayT<T>& other) {
 	ssize_ = other.ssize_;
 	capasity_ = other.capasity_;
 	data_ = new T[capasity_];
-	for (ptrdiff_t i = 0; i < ssize_; ++i) {
+	for (std::ptrdiff_t i = 0; i < ssize_; ++i) {
 		data_[i] = other.data_[i];
 	}
 }
 template<typename T>
-ArrayT<T>::ArrayT(const ptrdiff_t size) {
+ArrayT<T>::ArrayT(const std::ptrdiff_t size) {
 	if (size < 0) {
 		throw std::invalid_argument("Get size > 0");
 	}
@@ -75,7 +75,7 @@ ArrayT<T>::ArrayT(const ptrdiff_t size) {
 }
 
 template<typename T>
-void ArrayT<T>::change_capasity(const ptrdiff_t new_cap) {
+void ArrayT<T>::change_capasity(const std::ptrdiff_t new_cap) {
 	capasity_ = new_cap;
 	T* temp = new T[capasity_];
 	std::copy(data_, data_ + ssize(), temp);
@@ -85,7 +85,7 @@ void ArrayT<T>::change_capasity(const ptrdiff_t new_cap) {
 }
 
 template<typename T>
-T& ArrayT<T>::operator[] (const ptrdiff_t index) {
+T& ArrayT<T>::operator[] (const std::ptrdiff_t index) {
 	if ((index < 0) || (index >= capasity_)) {
 		throw std::invalid_argument("Index is out of acceptable area");
 	}
@@ -94,7 +94,7 @@ T& ArrayT<T>::operator[] (const ptrdiff_t index) {
 	}
 }
 template<typename T>
-const T& ArrayT<T>::operator[] (const ptrdiff_t index) const {
+const T& ArrayT<T>::operator[] (const std::ptrdiff_t index) const {
 	if ((index < 0) || (index >= ssize())) {
 		throw std::invalid_argument("Index is out of acceptable area");
 	}
@@ -109,7 +109,7 @@ ptrdiff_t ArrayT<T>::ssize() const noexcept {
 };
 
 template<typename T>
-void ArrayT<T>::resize(const ptrdiff_t new_size) {
+void ArrayT<T>::resize(const std::ptrdiff_t new_size) {
 	if (new_size <= 0) {
 		throw std::invalid_argument("size of array must be larger 0");
 	}
@@ -125,12 +125,12 @@ void ArrayT<T>::resize(const ptrdiff_t new_size) {
 
 
 template<typename T>
-void ArrayT<T>::remove(const ptrdiff_t i) {
+void ArrayT<T>::remove(const std::ptrdiff_t i) {
 	if ((i < 0) || (i >ssize())) {
 		throw std::invalid_argument("uncorrect index");
 	}
 	else {
-		for (ptrdiff_t t = i + 1; t < ssize_; ++t) {
+		for (std::ptrdiff_t t = i + 1; t < ssize_; ++t) {
 			data_[t - 1] = data_[t];
 		}
 		resize(ssize_ - 1);
@@ -138,13 +138,13 @@ void ArrayT<T>::remove(const ptrdiff_t i) {
 }
 
 template<typename T>
-void ArrayT<T>::insert(const ptrdiff_t i, const T value) {
+void ArrayT<T>::insert(const std::ptrdiff_t i, const T value) {
 	if (i < 0) {
 		throw std::invalid_argument("index must be larger 0");
 	}
 	else {
 		resize(ssize_ + 1);
-		for (ptrdiff_t index = ssize_ - 1; index > i; --index) {
+		for (std::ptrdiff_t index = ssize_ - 1; index > i; --index) {
 			data_[index] = data_[index - 1];
 		}
 		data_[i] = value;
