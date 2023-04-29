@@ -14,29 +14,29 @@
 class ArrayD {
 
 public:
-	ArrayD();
+	explicit ArrayD();
 
 	~ArrayD();
 
 	ArrayD(const ArrayD& other);
-
-	ArrayD(const ptrdiff_t size);
-
+	
 	ArrayD& operator=(const ArrayD&);
 
-	double& operator[] (const ptrdiff_t index);
+	ArrayD(const std::ptrdiff_t size);
 
-	const double& operator[] (const ptrdiff_t index) const;
+	double& operator[] (const std::ptrdiff_t index);
 
-	ptrdiff_t ssize() const noexcept;
+	const double& operator[] (const std::ptrdiff_t index) const;
 
-	void change_capasity(const ptrdiff_t other);
+	std::ptrdiff_t ssize() const noexcept;
+
+	void change_capasity(const std::ptrdiff_t other);
 	
-	void resize(const ptrdiff_t new_size);
+	void resize(const std::ptrdiff_t new_size);
 
-	void remove(const ptrdiff_t i);
+	void remove(const std::ptrdiff_t i);
 
-	void insert(const ptrdiff_t i, const double value);
+	void insert(const std::ptrdiff_t i, const double value);
 
 private:
 	ptrdiff_t ssize_ = 0;
