@@ -1,91 +1,51 @@
 #pragma once
 #include <cstddef>
 #include <iostream>
-#include <cmath>
 #include <algorithm>
 #include <utility>
-#include <sstream>
+
 
 class MatrixS {
-    using SizeType = std::tuple <ptrdiff_t, ptrdiff_t>;
 public:
-    explicit MatrixS() {
-        m_ = 0;
-        n_ = 0;
-    }
+    using SizeType = std::tuple <std::ptrdiff_t, std::ptrdiff_t>;
 
-    MatrixS(const ptrdiff_t row, const ptrdiff_t col) {
-        if (m_ < 0 and n_ < 0) {
-            throw std::invalid_argument("Size must be positive")
-        }
-        m_ = row; //êîëè÷åñòâî ñòîëáöîâ
-        n_ = col; //êîëè÷åñòâî ñòðîê
-        int* data_ = new int[m_ * n_];
-        for (int i = 0; i < (m_ * n_); ++i) {
-            data[i] = 0;
-        }
-    }
+    
+public:
+    MatrixS();
 
+    explicit MatrixS(const SizeType& size = { 0, 0 });
 
-    ~MatrixS() {
-        delete[] data_;
-    }
+    MatrixS(const std::ptrdiff_t m, const ptrdiff_t n);
 
-    MatrixS(const MatrixS& other) {
-        m_ = other.m_;
-        n_ = other.n_;
-        data_ = new int [m_*n_];
-        std::copy(other.data_, other.data_ + n_ * m_, data_);
-    }
+    ~MatrixS();
 
-    MatrixS& operator=(const MatrixS& other) {
-        if (this != &other) {
-            if (n_ != other.n_ || m_ != other.m_) {
-                delete[] data_;
-                n_ = other.n_;
-                m_ = other.m_;
-                data_ = new int[m_ * n_];
-            }
-            std::copy(other.data_, other.data_ + n_ * m_, data_);
-        }
-        return *this;
-    }
+    MatrixS(const MatrixS& other);
+
+    MatrixS& operator=(const MatrixS& other);
+
+  int& at(const SizeType& elem);
+    
+   const int& at(const SizeType& elem) const;
+
+   int& at(const std::ptrdiff_t i, const std::ptrdiff_t j);
+
+   const int& at(const std::ptrdiff_t i, const std::ptrdiff_t j) const;
 
 
-    [[nodiscard]] int& at(const MatrixS& elem) {
-        return data_[elem.m_][elem.n_];
-    }
-    [[nodiscard]] const int& at(const MatrixS& elem) const {
-        return data_[elem.m_][elem.n_];
-    }
-    [[nodiscard]] int& at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
-        return data_[i][j];
-    }
-    [[nodiscard]] const int& at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
-        return data_[i][j];
-    }
+    void resize(const SizeType& new_size);
 
+    void resize(const std::ptrdiff_t i, const std::ptrdiff_t j);
 
-    [[nodiscard]] const SizeType& ssize() const noexcept {
-        return size;
-    }
+    const SizeType& ssize() const noexcept;
 
+    std::ptrdiff_t nRows() const noexcept;
 
-    void resize(const MatrixS& new_size);
-
-    [[nodiscard]] auto getRows() const noexcept {
-        return m_;
-    }
-
-    [[nodiscard]] auto getCols() const noexcept {
-        return n_;
-    }
-    SizeType size = std::make_pair(m_, n_);
+    std::ptrdiff_t nCols() const noexcept;
+  
    
-
 private:
-    ptrdiff_t m_ = 0;
-    ptrdiff_t n_ = 0;
     int* data_ = nullptr;
-
+    std::ptrdiff_t row_ = 0;
+    std::ptrdiff_t col_ = 0;
+    std::ptrdiff_t size_ = 0;
 };
