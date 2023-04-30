@@ -1,29 +1,24 @@
 #include <iosfwd>
-#include <vector>
-#include "matrixs/matrixs.hpp";
+#include "matrixs/matrixs.hpp"
 #include <algorithm>
 
-MatrixS::MatrixS(const SizeType& size) {
-    row_ = std::get<0>(size);
-    col_ = std::get<1>(size);
-    if (row_ <= 0 || col_ <= 0) {
-        throw std::invalid_argument("Size must be positive");
-    }
-    data_ = new int[row_ * col_];
-    for (int i = 0; i < (row_ * col_); ++i) {
-        data_[i] = 0;
-    }
+MatrixS::MatrixS() {
+    row_ = 0;
+    col_ = 0;
+    size_ = 0;
+    data_ = nullptr;
 }
 
 
 MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n) {
     row_ = m;
     col_ = n;
+    size_ = row_ + row_ * col_;
     if (row_ <= 0 and col_ <= 0) {
         throw std::invalid_argument("Size must be positive");
     }
-    data_ = new int[row_ * col_];
-    for (int i = 0; i < (row_ * col_); ++i) {
+    data_ = new int[size_];
+    for (int i = 0; i < size_; ++i) {
         data_[i] = 0;
     }
 }
@@ -36,61 +31,58 @@ MatrixS::~MatrixS() {
 MatrixS::MatrixS(const MatrixS& other) {
     row_ = other.row_;
     col_ = other.col_;
-    data_ = new int[row_ * col_];
-    std::copy(other.data_, other.data_ + (col_ * row_), data_);
+    size_= row_ + row_ * col_;
+    data_ = new int[size_];
+    std::copy(other.data_, other.data_ + size_, data_);
 }
+//
+//MatrixS& MatrixS::operator=(const MatrixS& other) {
+//   row_ = other.row_;
+//    col_ = other.col_;
+//    size_ = other.size_;
+//    delete[] data_;
+//    data_ = new int[size_];
+//    for (std::ptrdiff_t i = 0; i < size_; ++i) {
+//        data_[i] = other.data_[i];
+//    }
+//    return *this;
+//    }
 
-MatrixS& MatrixS::operator=(const MatrixS& other) {
-    if (this != &other) {
-        if (row_ != other.row_ || col_ != other.col_) {
-            delete[] data_;
-            row_ = other.row_;
-            col_ = other.col_;
-            data_ = new int[row_ * col_];
-        }
-        std::copy(other.data_, other.data_ + (row_ * col_), data_);
-    }
-    return *this;
-}
 
-[[nodiscard]] int& MatrixS::at(const SizeType& elem) {
+//int& MatrixS::at(const SizeType& elem) {
+//    const ptrdiff_t first_elem = std::get<0>(elem);
+//    const ptrdiff_t second_elem = std::get<1>(elem);
+//    if (first_elem >= row_ and second_elem >= col_) {
+//        throw std::invalid_argument("Index is out of range");
+//    }
+//    return data_[first_elem * second_elem + second_elem];
+//}
+
+
+ const int& MatrixS::at(const SizeType& elem) const {
     const ptrdiff_t first_elem = std::get<0>(elem);
     const ptrdiff_t second_elem = std::get<1>(elem);
     if (first_elem >= row_ and second_elem >= col_) {
         throw std::invalid_argument("Index is out of range");
     }
-    return data_[first_elem * col_ + second_elem];
+    return data_[first_elem * second_elem + second_elem];
 }
 
-
-[[nodiscard]] const int& MatrixS::at(const SizeType& elem) const {
-    const ptrdiff_t first_elem = std::get<0>(elem);
-    const ptrdiff_t second_elem = std::get<1>(elem);
-    if (first_elem >= row_ and second_elem >= col_) {
-        throw std::invalid_argument("Index is out of range");
-    }
-    return data_[first_elem * col_ + second_elem];
-}
-
-[[nodiscard]] int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
+int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) {
     if (i >= row_ and j >= col_) {
         throw std::invalid_argument("Index is out of range");
     }
-    return data_[i * col_ + j];
+    return data_[i*j+j];
 }
 
-[[nodiscard]] const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
+ const int& MatrixS::at(const std::ptrdiff_t i, const std::ptrdiff_t j) const {
     if (i >= row_ and j >= col_) {
         throw std::invalid_argument("Index is out of range");
     }
-    return data_[i * col_ + j];
+    return data_[i * j + j];
 }
 
-int& MatrixS::operator[](const SizeType& elem) {
-    const ptrdiff_t first_elem = std::get<0>(elem);
-    const ptrdiff_t second_elem = std::get<1>(elem);
-    return data_[first_elem * col_ + second_elem];
-}
+
 void MatrixS::resize(const SizeType& new_size) {
     ptrdiff_t new_row_ = std::get<0>(new_size);
     ptrdiff_t new_col_ = std::get<1>(new_size);
@@ -99,41 +91,38 @@ void MatrixS::resize(const SizeType& new_size) {
     }
 
     MatrixS new_data_(new_row_, new_col_);
-    for (size_t i = 0; i < new_row_; i++) {
-        for (size_t j = 0; j < new_col_; j++) {
-            new_data_[ i*col_+j] = data_[i * col_ + j];
+    for (std::ptrdiff_t i = 0; i < new_row_; ++i) {
+        for (std::ptrdiff_t j = 0; j < new_col_; ++j) {
+            new_data_.at(i,j) = at(i,j);
         }
     }
-    data_ = new_data_.data_;
+    *this = new_data_;
 }
 
 void MatrixS::resize(const std::ptrdiff_t i, const std::ptrdiff_t j) {
-    if (i < 0 || j < 0) {
+    if (i <= 0 || j <= 0) {
         throw std::invalid_argument("Invalid arguments");
     }
-    if (i == 0 || j == 0) {
-        delete[] data_;
-        return;
-    }
+   
     MatrixS new_data_(i, j);
-    for (size_t I = 0; I <i; I++) {
-        for (size_t J = 0; J < j; J++) {
-            new_data_[I * col_ + J] = data_[I * col_ + J];
+    for (std::ptrdiff_t I = 0; I <i; I++) {
+        for (std::ptrdiff_t J = 0; J < j; J++) {
+            new_data_.at(I,J) = at(I,J);
         }
     }
-    data_ = new_data_.data_;
+    *this = new_data_;
 }
 
-[[nodiscard]] const MatrixS::SizeType& ssize() const noexcept {
-    return size_;
+const MatrixS::SizeType  &MatrixS::ssize() const noexcept {
+    return SizeType(row_,col_);
 }
 
 
-[[nodiscard]] std::ptrdiff_t nRows() const noexcept {
-    return this->row_;
+std::ptrdiff_t MatrixS::nRows() const noexcept {
+    return row_;
 }
 
-[[nodiscard]] std::ptrdiff_t nCols() const noexcept {
-    return this->col_;
+    std::ptrdiff_t MatrixS::nCols() const noexcept {
+    return col_;
 }
 
