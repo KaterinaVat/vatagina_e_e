@@ -12,7 +12,7 @@ class Rational {
 public:
 	Rational() = default;
 	Rational(const Rational&) = default;
-	Rational(const Rational&&)=default;
+	//Rational(const Rational&&)=default;
 	Rational(const int32_t num) noexcept;
 	Rational(const int32_t num, const int32_t denom);
 	Rational& operator=(const Rational&) ;
