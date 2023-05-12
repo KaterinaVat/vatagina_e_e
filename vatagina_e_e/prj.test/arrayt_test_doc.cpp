@@ -1,6 +1,5 @@
 
 #include <iostream>
-#include "doctest.h"
 #include "arrayt/arrayt.hpp"
 
 
