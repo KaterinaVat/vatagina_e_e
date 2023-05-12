@@ -129,3 +129,6 @@ std::ptrdiff_t MatrixS::nRows() const noexcept {
 std::ptrdiff_t MatrixS::nCols() const noexcept {
     return col_;
 }
+
+
+
