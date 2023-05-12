@@ -5,12 +5,12 @@
 #include <algorithm>
 #include <cmath>
 
-ArrayD::ArrayD(){
-	ssize_=0;
-	capasity_=0;
-	data_=nullptr;
+ArrayD::ArrayD() {
+	ssize_ = 0;
+	capasity_ = 0;
+	data_ = nullptr;
 }
-		
+
 
 ArrayD::~ArrayD() {
 	delete[] data_;
@@ -33,7 +33,7 @@ ArrayD::ArrayD(const std::ptrdiff_t size) {
 		capasity_ = size;
 		data_ = new double[ssize_];
 		std::fill(data_, data_ + ssize_, 0);
-		}
+	}
 }
 
 ArrayD& ArrayD::operator=(const ArrayD& other) {
@@ -82,30 +82,44 @@ void ArrayD::resize(const std::ptrdiff_t new_size) {
 	if (new_size > capasity_) {
 		change_capasity(new_size);
 	}
-	if (new_size>ssize_){
-		std::fill(data_ + ssize_, data_ + new_size, 0);	
+	if (new_size > ssize_) {
+		std::fill(data_ + ssize_, data_ + new_size, 0);
 	}
-		ssize_ = new_size;
-	}
+	ssize_ = new_size;
+}
 
 
 void ArrayD::remove(const std::ptrdiff_t i) {
 	if ((i < 0) || (i > capasity_)) {
 		throw std::invalid_argument("uncorrect index");
-	for (std::ptrdiff_t t = i+1; t< ssize_; ++t) {
-		data_[t-1] = data_[t];
 	}
-	resize(ssize_-1);
+	double* temp = new double[ssize_ - 1];
+	for (std::ptrdiff_t bgn = 0; bgn < i; ++bgn) {	
+	temp[bgn] = data_[bgn];
+	}
+	for (std::ptrdiff_t end = i; end < ssize_ - 2; ++end) {
+	temp[end] = data_[end + 1];
+	}
+	delete[] data_;
+	data_ = temp;
+	ssize_ = ssize_ - 1;
 }
 
 
-void ArrayD::insert(const std::ptrdiff_t i, const double value) {
-	if (i < 0 || i>ssize()) {
-		throw std::invalid_argument("index must be larger 0");
+	void ArrayD::insert(const std::ptrdiff_t i, const double value) {
+		if (i < 0 || i>ssize()) {
+			throw std::invalid_argument("index must be larger 0");
+		}
+		double* temp = new double[ssize_ + 1];
+		for (std::ptrdiff_t bgn = 0; bgn < i; ++bgn) {
+			temp[bgn] = data_[bgn];
+		}
+		temp[i] = value;
+		for (std::ptrdiff_t end = i+1; end < ssize_ +1; ++end) {
+			temp[end] = data_[end + 1];
+		}
+		delete[] data_;
+		data_ = temp;
+		ssize_ = ssize_ + 1;
+	
 	}
-	resize(ssize_ + 1);
-	for (std::ptrdiff_t index = ssize_ - 1; index > i; --index) {
-		data_[index] = data_[index - 1];
-	}
-	data_[i] = value;
-}
