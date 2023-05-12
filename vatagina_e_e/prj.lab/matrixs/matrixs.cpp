@@ -13,7 +13,7 @@ MatrixS::MatrixS() {
 MatrixS::MatrixS(const std::ptrdiff_t m, const std::ptrdiff_t n) {
     row_ = m;
     col_ = n;
-    size_ = row_ + row_ * col_;
+    size_ = row_ * col_;
     if (row_ <= 0 and col_ <= 0) {
         throw std::invalid_argument("Size must be positive");
     }
@@ -31,7 +31,7 @@ MatrixS::~MatrixS() {
 MatrixS::MatrixS(const MatrixS& other) {
     row_ = other.row_;
     col_ = other.col_;
-    size_ = row_ + row_ * col_;
+    size_ = row_ * col_;
     data_ = new int[size_];
     std::copy(other.data_, other.data_ + size_, data_);
 }
